@@ -2,27 +2,35 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+
+        stage('Build Docker Image') {
             steps {
-                echo 'Checking out source code'
-                checkout scm
+                sh 'docker build -t YOUR_DOCKER_USERNAME/myapp:latest .'
             }
         }
-        stage('Build') {
+
+        stage('Push Docker Image') {
             steps {
-                echo 'Building the web project'
-                sh 'echo "This is a simple static HTML/CSS/JS project."'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh '''
+                    echo $PASS | docker login -u $USER --password-stdin
+                    docker push YOUR_DOCKER_USERNAME/myapp:latest
+                    '''
+                }
             }
         }
-        stage('Test') {
-            steps {
-                echo 'Running a quick validation'
-                sh 'test -f index.html && echo "index.html exists"'
-            }
-        }
+
         stage('Deploy') {
             steps {
-                echo 'Deployment stage placeholder'
+                sh '''
+                docker stop myapp || true
+                docker rm myapp || true
+                docker run -d -p 80:80 --name myapp YOUR_DOCKER_USERNAME/myapp:latest
+                '''
             }
         }
     }
