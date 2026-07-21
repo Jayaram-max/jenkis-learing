@@ -5,7 +5,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t YOUR_DOCKER_USERNAME/myapp:latest .'
+                sh 'docker build -t jayaram231/myapp:latest .'
             }
         }
 
@@ -18,7 +18,7 @@ pipeline {
                 )]) {
                     sh '''
                     echo $PASS | docker login -u $USER --password-stdin
-                    docker push YOUR_DOCKER_USERNAME/myapp:latest
+                    docker push jayaram231/myapp:latest
                     '''
                 }
             }
@@ -29,7 +29,7 @@ pipeline {
                 sh '''
                 docker stop myapp || true
                 docker rm myapp || true
-                docker run -d -p 80:80 --name myapp YOUR_DOCKER_USERNAME/myapp:latest
+                docker run -d -p 80:80 --name myapp jayaram231/myapp:latest
                 '''
             }
         }
