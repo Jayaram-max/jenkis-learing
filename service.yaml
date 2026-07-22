@@ -1,0 +1,24 @@
+# Service for exposing the myapp deployment inside and outside the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  # The service name exposed to clients.
+  name: myapp-service
+  namespace: default
+  labels:
+    app: myapp
+spec:
+  # NodePort makes the app reachable on a port on each node.
+  type: NodePort
+  selector:
+    # Matches the pods created by the deployment.
+    app: myapp
+  ports:
+    - protocol: TCP
+      # Port exposed by the service.
+      port: 80
+      # Port the application listens on inside the container.
+      targetPort: 80
+      # Port exposed on each node for external access.
+      # You can change this if needed, but it must be between 30000 and 32767.
+      nodePort: 30080

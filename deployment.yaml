@@ -1,0 +1,59 @@
+# Deployment for the myapp application
+# This creates and manages the pods running your container image.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # The name of the deployment resource.
+  name: myapp
+  # The namespace where this deployment will be created.
+  namespace: default
+  # Labels help identify and organize resources.
+  labels:
+    app: myapp
+spec:
+  # Number of pod replicas to run.
+  replicas: 2
+  # Selects which pods belong to this deployment.
+  selector:
+    matchLabels:
+      app: myapp
+  # Template for the pods created by this deployment.
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        # Container name inside the pod.
+        - name: myapp
+          # Docker image pulled from Docker Hub.
+          image: jayaram231/myapp:latest
+          # Always pull the latest image version.
+          imagePullPolicy: Always
+          ports:
+            # Container port exposed by the application.
+            # If your app listens on a different port, change this value.
+            - containerPort: 80
+          resources:
+            # Minimum resources requested for the container.
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            # Maximum resources the container can use.
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          readinessProbe:
+            # Checks if the container is ready to receive traffic.
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            # Checks whether the container is still alive.
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
